@@ -1,34 +1,24 @@
-import {
-  Chip,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-} from "@heroui/react";
+import { Chip, Input } from "@heroui/react";
 
+import ColumnHeader from "@/components/column-header";
 import { title } from "@/components/primitives";
 import { useDataContext } from "@/context/DataContext";
 import useFetchItems from "@/hooks/useFetchItems";
-import useInfiniteScroll from "@/hooks/useInfiniteScroll";
 import DefaultLayout from "@/layouts/default";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { TableVirtuoso, VirtuosoHandle } from "react-virtuoso";
 
 export default function IndexPage() {
   const navigate = useNavigate();
   const { data, setData } = useDataContext();
+  const virtuosoRef = useRef<VirtuosoHandle>(null);
 
   const {
     data: queryData,
     fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
     isLoading,
   } = useFetchItems();
-
-  const observerRef = useInfiniteScroll(hasNextPage, fetchNextPage);
 
   useEffect(() => {
     if (queryData) {
@@ -53,90 +43,92 @@ export default function IndexPage() {
       </section>
 
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8">
-        <div className="gap-3 overflow-auto max-h-[650px] rounded-lg">
-          {/* <div className="flex flex-wrap items-center gap-4 mb-6">
-            <div className="flex-1 min-w-[240px] max-w-sm">
-              <Input 
-                label="Search materials" 
-                placeholder="Search by name..." 
-                className="w-full"
-                startContent={
-                  <svg className="w-4 h-4 text-gray-400" fill="none" strokeWidth="2" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                }
-              />
-            </div>
-            
-            <select 
-              className="flex-none h-[40px] min-w-[200px] rounded-lg border border-gray-200 dark:border-gray-700 bg-transparent px-3 text-sm transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              defaultValue=""
-            >
-              <option value="" disabled>Filter by Manufacturer</option>
-              <option value="all">All Manufacturers</option>
-              <option value="apple">Apple</option>
-              <option value="samsung">Samsung</option>
-              <option value="sony">Sony</option>
-              <option value="lg">LG</option>
-            </select>
-          </div> */}
-          <Table
-            aria-label="Materials table"
-            className="min-w-full"
-            classNames={{
-              th: "bg-gray-50 dark:bg-gray-900/50 text-sm font-semibold text-gray-600 dark:text-gray-300 py-4",
-              td: "py-4",
+        <div className="grid grid-cols-3 gap-4">
+          <Input
+            label="Search"
+            labelPlacement="outside"
+            placeholder="Search by Material Name"
+            variant="bordered"
+          />
+          <Input
+            label="Name"
+            labelPlacement="outside"
+            placeholder="Enter item name"
+            variant="bordered"
+          />
+          <Input
+            label="Name"
+            labelPlacement="outside"
+            placeholder="Enter item name"
+            variant="bordered"
+          />
+        </div>
+        <div className="gap-3 overflow-auto max-h-[650px] rounded-lg mt-4">
+          <TableVirtuoso
+            ref={virtuosoRef}
+            className="!h-[100vh] w-full border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden"
+            data={data}
+            endReached={() => fetchNextPage()}
+            components={{
+              Table: (props) => (
+                <table {...props} className="w-full border-collapse" />
+              ),
+              TableRow: ({ item, ...props }) => (
+                <tr
+                  {...props}
+                  className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors cursor-pointer"
+                  onClick={() => item && navigate(`/detail/${item.id}`)}
+                />
+              ),
             }}
-          >
-            <TableHeader>
-              <TableColumn>#</TableColumn>
-              <TableColumn>Material Name</TableColumn>
-              <TableColumn>Category</TableColumn>
-              <TableColumn>Manufacturer</TableColumn>
-              <TableColumn>Price</TableColumn>
-            </TableHeader>
-
-            <TableBody
-              isLoading={isLoading}
-              loadingContent={
-                <div className="w-full h-96 flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-                </div>
-              }
-            >
-              {data.map((item, index) => (
-                <TableRow
-                  key={item.id}
-                  onClick={() => navigate(`/detail/${item.id}`)}
-                  className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
-                >
-                  <TableCell>{index + 1}</TableCell>
-                  <TableCell className="font-medium">{item.name}</TableCell>
-                  <TableCell>
-                    <Chip
-                      size="sm"
-                      className="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
-                    >
-                      {item.category}
-                    </Chip>
-                  </TableCell>
-                  <TableCell>{item.manufacturer_name}</TableCell>
-                  <TableCell className="font-medium">
-                    ${Number(item.requested_unit_price).toLocaleString()}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-
-          <div ref={observerRef} className="p-4 text-center">
-            {isFetchingNextPage && (
-              <div className="flex items-center justify-center gap-2">
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
-                <span className="text-gray-500">Loading more items...</span>
-              </div>
+            itemContent={(index, item) => (
+              <>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700">
+                  {index + 1}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700">
+                  {item.name}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap border-b border-gray-200 dark:border-gray-700">
+                  <Chip
+                    size="sm"
+                    className="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+                  >
+                    {item.category}
+                  </Chip>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700">
+                  {item.manufacturer_name}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700">
+                  $ {Number(item.requested_unit_price).toLocaleString()}
+                </td>
+              </>
             )}
-          </div>
+            fixedFooterContent={
+              isLoading
+                ? () => (
+                    <tr>
+                      <td
+                        colSpan={5}
+                        className="px-6 py-4 text-center text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50"
+                      >
+                        Loading...
+                      </td>
+                    </tr>
+                  )
+                : undefined
+            }
+            fixedHeaderContent={() => (
+              <tr>
+                <ColumnHeader label="#" />
+                <ColumnHeader label="Material Name" />
+                <ColumnHeader label="Category" />
+                <ColumnHeader label="Manufacturer" />
+                <ColumnHeader label="Price" />
+              </tr>
+            )}
+          />
         </div>
       </div>
     </DefaultLayout>

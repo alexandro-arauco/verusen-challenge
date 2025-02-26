@@ -1,4 +1,4 @@
-import { getMaterials } from "@/hooks/useFetchItems";
+import { getMaterials } from "@/hooks/useFetchItemsPaginated";
 import { Material } from "@/interfaces/materials";
 import { createContext, useContext, useEffect, useState } from "react";
 
@@ -39,7 +39,7 @@ export const DataProvider = ({ children }: { children: React.ReactNode }) => {
     );
   };
 
-  console.log({ categories });
+  //console.log({ data });
 
   return (
     <DataContext.Provider value={{ data, setData, categories }}>
