@@ -30,6 +30,7 @@ export default function EditDetail({ isOpen, onClose, data }: EditDetailProps) {
           <>
             <ModalHeader className="flex flex-col gap-1">Edit Item</ModalHeader>
             <ModalBody>
+              {data.name}
               {/* <div className="grid gap-6">
                 <div className="grid grid-cols-2 gap-4">
                   <Input
