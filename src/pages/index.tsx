@@ -3,48 +3,49 @@ import { Chip, Input, Select, SelectItem } from "@heroui/react";
 import ColumnHeader from "@/components/column-header";
 import { title } from "@/components/primitives";
 import { useDataContext } from "@/context/DataContext";
-import useFetchItems from "@/hooks/useFetchItems";
+
 import DefaultLayout from "@/layouts/default";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { TableVirtuoso, VirtuosoHandle } from "react-virtuoso";
 
 export default function IndexPage() {
   const navigate = useNavigate();
-
-  const { data, setData, setSettingSort, settingSort } = useDataContext();
+  const { data, setSettingSort, settingSort, manufacturers } = useDataContext();
   const virtuosoRef = useRef<VirtuosoHandle>(null);
 
   const [filter, setFilter] = useState<string>("");
+  const [manufacturer, setManufacturer] = useState("-1");
   const [sortPrice, setSortPrice] = useState<"asc" | "desc">(settingSort.sort);
-
-  const {
-    data: queryData,
-    fetchNextPage,
-    isLoading,
-  } = useFetchItems(settingSort);
-
-  useEffect(() => {
-    if (queryData) {
-      console.log(queryData);
-      const allItems = queryData.pages.flatMap((page) => page.items);
-
-      setData(allItems);
-    }
-  }, [queryData, setData]);
 
   const filteredData = useMemo(() => {
     let result = [...data];
 
+    // Apply filter
     if (filter) {
-      result = data.filter(
+      result = result.filter(
         (item) =>
           item.name && item.name.toLowerCase().includes(filter.toLowerCase())
       );
     }
 
+    if (manufacturer !== "-1") {
+      console.log({ manufacturer });
+      result = result.filter(
+        (item) =>
+          item.manufacturer_name &&
+          item.manufacturer_name.toLowerCase() === manufacturer.toLowerCase()
+      );
+    }
+
+    result.sort((a, b) => {
+      const valueA = Number(a[settingSort.key]);
+      const valueB = Number(b[settingSort.key]);
+      return sortPrice === "asc" ? valueA - valueB : valueB - valueA;
+    });
+
     return result;
-  }, [filter, sortPrice, data]);
+  }, [filter, data, sortPrice, manufacturer]);
 
   return (
     <DefaultLayout>
@@ -80,7 +81,6 @@ export default function IndexPage() {
             selectedKeys={[sortPrice]}
             onChange={(e) => {
               setSortPrice(e.target.value as "asc" | "desc");
-
               setSettingSort({
                 key: "requested_unit_price",
                 sort: e.target.value as "asc" | "desc",
@@ -91,13 +91,33 @@ export default function IndexPage() {
               <SelectItem key={item}>{item.toUpperCase()}</SelectItem>
             ))}
           </Select>
+
+          <Select
+            label="Filter by Manufacturer"
+            labelPlacement="outside"
+            placeholder="Select manufacturer"
+            variant="bordered"
+            selectedKeys={[manufacturer]}
+            onChange={(e) => {
+              console.log(e.target.value);
+              setManufacturer(e.target.value);
+            }}
+          >
+            <>
+              <SelectItem key={"-1"}>{"All"}</SelectItem>
+              {manufacturers.map((item) => (
+                <SelectItem key={item.key}>
+                  {item.label.toUpperCase()}
+                </SelectItem>
+              ))}
+            </>
+          </Select>
         </div>
-        <div className="gap-3 overflow-auto max-h-[650px] rounded-lg mt-4">
+        <div className="gap-3 mt-4">
           <TableVirtuoso
             ref={virtuosoRef}
-            className="!h-[100vh] w-full border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden"
+            className="!h-[500px] w-full border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden"
             data={filteredData}
-            endReached={() => fetchNextPage()}
             components={{
               Table: (props) => (
                 <table {...props} className="w-full border-collapse" />
@@ -134,20 +154,6 @@ export default function IndexPage() {
                 </td>
               </>
             )}
-            fixedFooterContent={
-              isLoading
-                ? () => (
-                    <tr>
-                      <td
-                        colSpan={5}
-                        className="px-6 py-4 text-center text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50"
-                      >
-                        Loading...
-                      </td>
-                    </tr>
-                  )
-                : undefined
-            }
             fixedHeaderContent={() => (
               <tr>
                 <ColumnHeader label="#" />

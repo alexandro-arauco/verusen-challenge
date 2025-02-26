@@ -59,6 +59,7 @@ export default function EditDetail({ isOpen, onClose, data }: EditDetailProps) {
       onClose={onClose}
       backdrop="blur"
       isDismissable={false}
+      placement="top"
       isKeyboardDismissDisabled
       closeButton
     >
