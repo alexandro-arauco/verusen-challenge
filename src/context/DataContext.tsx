@@ -2,22 +2,33 @@ import { getMaterials } from "@/hooks/useFetchItemsPaginated";
 import { Material } from "@/interfaces/materials";
 import { createContext, useContext, useEffect, useState } from "react";
 
-type Category = {
+type DataDropdown = {
   key: string;
   label: string;
+};
+
+export type Sort = {
+  key: keyof Material;
+  sort: "asc" | "desc";
 };
 
 type DataContextType = {
   data: Material[];
   setData: (data: Material[]) => void;
-  categories: Category[];
+  categories: DataDropdown[];
+  settingSort: Sort;
+  setSettingSort: (setting: Sort) => void;
 };
 
 const DataContext = createContext<DataContextType | null>(null);
 
 export const DataProvider = ({ children }: { children: React.ReactNode }) => {
   const [data, setData] = useState<Material[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<DataDropdown[]>([]);
+  const [settingSort, setSettingSort] = useState<Sort>({
+    key: "requested_unit_price",
+    sort: "asc",
+  });
 
   useEffect(() => {
     getCategories();
@@ -27,22 +38,27 @@ export const DataProvider = ({ children }: { children: React.ReactNode }) => {
     const materials = await getMaterials();
 
     setCategories(
-      materials.reduce<Category[]>((acc: Category[], material: Material) => {
-        if (
-          !acc.find((category: Category) => category.key === material.category)
-        ) {
-          acc.push({ key: material.category, label: material.category });
-        }
+      materials.reduce<DataDropdown[]>(
+        (acc: DataDropdown[], material: Material) => {
+          if (
+            !acc.find(
+              (category: DataDropdown) => category.key === material.category
+            )
+          ) {
+            acc.push({ key: material.category, label: material.category });
+          }
 
-        return acc;
-      }, [])
+          return acc;
+        },
+        []
+      )
     );
   };
 
-  //console.log({ data });
-
   return (
-    <DataContext.Provider value={{ data, setData, categories }}>
+    <DataContext.Provider
+      value={{ data, setData, categories, settingSort, setSettingSort }}
+    >
       {children}
     </DataContext.Provider>
   );

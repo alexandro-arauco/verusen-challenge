@@ -1,33 +1,50 @@
-import { Chip, Input } from "@heroui/react";
+import { Chip, Input, Select, SelectItem } from "@heroui/react";
 
 import ColumnHeader from "@/components/column-header";
 import { title } from "@/components/primitives";
 import { useDataContext } from "@/context/DataContext";
 import useFetchItems from "@/hooks/useFetchItems";
 import DefaultLayout from "@/layouts/default";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { TableVirtuoso, VirtuosoHandle } from "react-virtuoso";
 
 export default function IndexPage() {
   const navigate = useNavigate();
-  const { data, setData } = useDataContext();
+
+  const { data, setData, setSettingSort, settingSort } = useDataContext();
   const virtuosoRef = useRef<VirtuosoHandle>(null);
+
+  const [filter, setFilter] = useState<string>("");
+  const [sortPrice, setSortPrice] = useState<"asc" | "desc">(settingSort.sort);
 
   const {
     data: queryData,
     fetchNextPage,
     isLoading,
-  } = useFetchItems();
+  } = useFetchItems(settingSort);
 
   useEffect(() => {
     if (queryData) {
+      console.log(queryData);
       const allItems = queryData.pages.flatMap((page) => page.items);
-      const newData = [...data, ...allItems];
 
-      setData(newData);
+      setData(allItems);
     }
   }, [queryData, setData]);
+
+  const filteredData = useMemo(() => {
+    let result = [...data];
+
+    if (filter) {
+      result = data.filter(
+        (item) =>
+          item.name && item.name.toLowerCase().includes(filter.toLowerCase())
+      );
+    }
+
+    return result;
+  }, [filter, sortPrice, data]);
 
   return (
     <DefaultLayout>
@@ -49,25 +66,37 @@ export default function IndexPage() {
             labelPlacement="outside"
             placeholder="Search by Material Name"
             variant="bordered"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            onClear={() => setFilter("")}
+            isClearable
           />
-          <Input
-            label="Name"
+
+          <Select
+            label="Sort by Price"
             labelPlacement="outside"
-            placeholder="Enter item name"
+            placeholder="Select category"
             variant="bordered"
-          />
-          <Input
-            label="Name"
-            labelPlacement="outside"
-            placeholder="Enter item name"
-            variant="bordered"
-          />
+            selectedKeys={[sortPrice]}
+            onChange={(e) => {
+              setSortPrice(e.target.value as "asc" | "desc");
+
+              setSettingSort({
+                key: "requested_unit_price",
+                sort: e.target.value as "asc" | "desc",
+              });
+            }}
+          >
+            {["asc", "desc"].map((item) => (
+              <SelectItem key={item}>{item.toUpperCase()}</SelectItem>
+            ))}
+          </Select>
         </div>
         <div className="gap-3 overflow-auto max-h-[650px] rounded-lg mt-4">
           <TableVirtuoso
             ref={virtuosoRef}
             className="!h-[100vh] w-full border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden"
-            data={data}
+            data={filteredData}
             endReached={() => fetchNextPage()}
             components={{
               Table: (props) => (
