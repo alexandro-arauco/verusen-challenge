@@ -1,20 +1,19 @@
 import {
+  Chip,
   Table,
   TableBody,
   TableCell,
   TableColumn,
   TableHeader,
-  TableRow,
-  Chip,
-  Input,
+  TableRow
 } from "@heroui/react";
 
 import { title } from "@/components/primitives";
-import DefaultLayout from "@/layouts/default";
 import { useDataContext } from "@/context/DataContext";
-import useInfiniteScroll from "@/hooks/useInfiniteScroll";
-import { useEffect } from "react";
 import useFetchItems from "@/hooks/useFetchItems";
+import useInfiniteScroll from "@/hooks/useInfiniteScroll";
+import DefaultLayout from "@/layouts/default";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function IndexPage() {

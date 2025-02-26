@@ -1,15 +1,11 @@
 import { Material } from "@/interfaces/materials";
 import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
   Button,
-  Input,
-  Select,
-  SelectItem,
-  Textarea,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
 } from "@heroui/react";
 
 type EditDetailProps = {
