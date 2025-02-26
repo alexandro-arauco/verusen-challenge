@@ -27,7 +27,6 @@ export const DataProvider = ({ children }: { children: React.ReactNode }) => {
   const [data, setData] = useState<Material[]>([]);
   const [categories, setCategories] = useState<DataDropdown[]>([]);
   const [manufacturers, setManufacturers] = useState<DataDropdown[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [settingSort, setSettingSort] = useState<Sort>({
     key: "requested_unit_price",
     sort: "asc",
