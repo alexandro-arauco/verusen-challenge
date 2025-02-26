@@ -18,21 +18,31 @@ This is a template for creating applications using Vite and HeroUI (v2).
 To clone the project, run the following command:
 
 ```bash
-git clone https://github.com/frontio-ai/vite-template.git
+git clone https://github.com/alexandro-arauco/verusen-challenge.git
 ```
 
 ### Install dependencies
 
-You can use one of them `npm`, `yarn`, `pnpm`, `bun`, Example using `npm`:
+You can use one of them `npm`, `yarn`, `pnpm`, `bun`. Example using `npm`:
 
 ```bash
 npm install
 ```
 
-### Run the development server
+### Available Scripts
 
 ```bash
+# Start development server
 npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+
+# Run linting
+npm run lint
 ```
 
 ### Setup pnpm (optional)
@@ -44,6 +54,17 @@ public-hoist-pattern[]=*@heroui/*
 ```
 
 After modifying the `.npmrc` file, you need to run `pnpm install` again to ensure that the dependencies are installed correctly.
+
+## Project Structure
+
+```
+src/
+├── components/     # Reusable components
+├── pages/         # Page components
+├── hooks/         # Custom React hooks
+├── context/       # React context providers
+└── interfaces/    # TypeScript interfaces
+```
 
 ## License
 
