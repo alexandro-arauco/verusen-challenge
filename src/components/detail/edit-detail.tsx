@@ -34,7 +34,7 @@ export default function EditDetail({ isOpen, onClose, data }: EditDetailProps) {
           <>
             <ModalHeader className="flex flex-col gap-1">Edit Item</ModalHeader>
             <ModalBody>
-              <div className="grid gap-6">
+              {/* <div className="grid gap-6">
                 <div className="grid grid-cols-2 gap-4">
                   <Input
                     label="Name"
@@ -96,7 +96,7 @@ export default function EditDetail({ isOpen, onClose, data }: EditDetailProps) {
                   className="w-full"
                   value={data.long_description || ""}
                 />
-              </div>
+              </div> */}
             </ModalBody>
             <ModalFooter>
               <Button color="danger" variant="light" onPress={onClose}>
