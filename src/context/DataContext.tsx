@@ -1,4 +1,4 @@
-import { getMaterials } from "@/hooks/useFetchItemsPaginated";
+import { getMaterials } from "@/hook/useFetchItems";
 import { Material } from "@/interfaces/materials";
 import { createContext, useContext, useEffect, useState } from "react";
 
