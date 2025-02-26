@@ -101,7 +101,7 @@ export default function DetailPage() {
                 Unit Price
               </h2>
               <p className="text-xl font-medium mt-2 text-blue-600 dark:text-blue-400">
-                ${item.requested_unit_price.toLocaleString()}
+                ${Number(item.requested_unit_price).toLocaleString()}
               </p>
             </div>
           </div>

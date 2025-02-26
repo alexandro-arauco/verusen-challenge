@@ -5,7 +5,7 @@ import {
   TableCell,
   TableColumn,
   TableHeader,
-  TableRow
+  TableRow,
 } from "@heroui/react";
 
 import { title } from "@/components/primitives";
@@ -33,7 +33,9 @@ export default function IndexPage() {
   useEffect(() => {
     if (queryData) {
       const allItems = queryData.pages.flatMap((page) => page.items);
-      setData(allItems);
+      const newData = [...data, ...allItems];
+
+      setData(newData);
     }
   }, [queryData, setData]);
 
@@ -120,7 +122,7 @@ export default function IndexPage() {
                   </TableCell>
                   <TableCell>{item.manufacturer_name}</TableCell>
                   <TableCell className="font-medium">
-                    ${item.requested_unit_price.toLocaleString()}
+                    ${Number(item.requested_unit_price).toLocaleString()}
                   </TableCell>
                 </TableRow>
               ))}

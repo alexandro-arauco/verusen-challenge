@@ -2,8 +2,7 @@ import { Material } from "@/interfaces/materials";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
 const fetchItems = async ({ pageParam = 1 }) => {
-  const response = await fetch("/materials.json");
-  const json = (await response.json()) as Material[];
+  const json = await getMaterials();
 
   const pageSize = 10;
   const startIndex = (pageParam - 1) * pageSize;
@@ -38,3 +37,10 @@ const useFetchItems = () => {
 };
 
 export default useFetchItems;
+
+export const getMaterials = async () => {
+  const response = await fetch("/materials.json");
+  const json = (await response.json()) as Material[];
+
+  return json;
+};
