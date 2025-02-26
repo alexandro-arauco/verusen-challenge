@@ -1,51 +1,33 @@
-import { Chip, Input, Select, SelectItem } from "@heroui/react";
+import { Chip } from "@heroui/react";
 
 import ColumnHeader from "@/components/column-header";
 import { title } from "@/components/primitives";
 import { useDataContext } from "@/context/DataContext";
 
+import TableFilters from "@/components/table-filter";
+import { useFilteredData } from "@/hooks/useFilteredData";
+import { Filters } from "@/interfaces/filters";
 import DefaultLayout from "@/layouts/default";
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { TableVirtuoso, VirtuosoHandle } from "react-virtuoso";
 
 export default function IndexPage() {
   const navigate = useNavigate();
-  const { data, setSettingSort, settingSort, manufacturers } = useDataContext();
+  const { data, settingSort } = useDataContext();
   const virtuosoRef = useRef<VirtuosoHandle>(null);
 
-  const [filter, setFilter] = useState<string>("");
-  const [manufacturer, setManufacturer] = useState("-1");
-  const [sortPrice, setSortPrice] = useState<"asc" | "desc">(settingSort.sort);
+  const [filters, setFilters] = useState<Filters>({
+    name: "",
+    sort: settingSort.sort,
+    manufacturer: "-1",
+  });
 
-  const filteredData = useMemo(() => {
-    let result = [...data];
+  const filteredData = useFilteredData(data, filters, settingSort);
 
-    // Apply filter
-    if (filter) {
-      result = result.filter(
-        (item) =>
-          item.name && item.name.toLowerCase().includes(filter.toLowerCase())
-      );
-    }
-
-    if (manufacturer !== "-1") {
-      console.log({ manufacturer });
-      result = result.filter(
-        (item) =>
-          item.manufacturer_name &&
-          item.manufacturer_name.toLowerCase() === manufacturer.toLowerCase()
-      );
-    }
-
-    result.sort((a, b) => {
-      const valueA = Number(a[settingSort.key]);
-      const valueB = Number(b[settingSort.key]);
-      return sortPrice === "asc" ? valueA - valueB : valueB - valueA;
-    });
-
-    return result;
-  }, [filter, data, sortPrice, manufacturer]);
+  const handleFilter = (key: keyof Filters, value: string) => {
+    setFilters((prev) => ({ ...prev, [key]: value }));
+  };
 
   return (
     <DefaultLayout>
@@ -61,58 +43,8 @@ export default function IndexPage() {
       </section>
 
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8">
-        <div className="grid grid-cols-3 gap-4">
-          <Input
-            label="Search"
-            labelPlacement="outside"
-            placeholder="Search by Material Name"
-            variant="bordered"
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            onClear={() => setFilter("")}
-            isClearable
-          />
+        <TableFilters filters={filters} handleFilter={handleFilter} />
 
-          <Select
-            label="Sort by Price"
-            labelPlacement="outside"
-            placeholder="Select category"
-            variant="bordered"
-            selectedKeys={[sortPrice]}
-            onChange={(e) => {
-              setSortPrice(e.target.value as "asc" | "desc");
-              setSettingSort({
-                key: "requested_unit_price",
-                sort: e.target.value as "asc" | "desc",
-              });
-            }}
-          >
-            {["asc", "desc"].map((item) => (
-              <SelectItem key={item}>{item.toUpperCase()}</SelectItem>
-            ))}
-          </Select>
-
-          <Select
-            label="Filter by Manufacturer"
-            labelPlacement="outside"
-            placeholder="Select manufacturer"
-            variant="bordered"
-            selectedKeys={[manufacturer]}
-            onChange={(e) => {
-              console.log(e.target.value);
-              setManufacturer(e.target.value);
-            }}
-          >
-            <>
-              <SelectItem key={"-1"}>{"All"}</SelectItem>
-              {manufacturers.map((item) => (
-                <SelectItem key={item.key}>
-                  {item.label.toUpperCase()}
-                </SelectItem>
-              ))}
-            </>
-          </Select>
-        </div>
         <div className="gap-3 mt-4">
           <TableVirtuoso
             ref={virtuosoRef}

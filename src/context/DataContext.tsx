@@ -1,4 +1,4 @@
-import { getMaterials } from "@/hook/useFetchItems";
+import { getMaterials } from "@/hooks/useFetchItems";
 import { Material } from "@/interfaces/materials";
 import { createContext, useContext, useEffect, useState } from "react";
 
