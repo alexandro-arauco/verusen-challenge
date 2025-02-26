@@ -1,7 +1,10 @@
 import * as React from "react";
 
-import { IconSvgProps } from "@/types";
 import logo from "/logo.png";
+
+type IconSvgProps = React.SVGProps<SVGSVGElement> & {
+  size?: number;
+};
 
 export const Logo: React.FC = () => (
   <img alt="HeroUI Logo" src={logo} width={60} />
