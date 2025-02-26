@@ -53,7 +53,7 @@ export default function IndexPage() {
 
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8">
         <div className="gap-3 overflow-auto max-h-[650px] rounded-lg">
-          <div className="flex flex-wrap items-center gap-4 mb-6">
+          {/* <div className="flex flex-wrap items-center gap-4 mb-6">
             <div className="flex-1 min-w-[240px] max-w-sm">
               <Input 
                 label="Search materials" 
@@ -78,7 +78,7 @@ export default function IndexPage() {
               <option value="sony">Sony</option>
               <option value="lg">LG</option>
             </select>
-          </div>
+          </div> */}
           <Table
             aria-label="Materials table"
             className="min-w-full"
